@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    <link rel="stylesheet" href="/Style/estilo.css">
+</head>
+<body>
+    <div id="home">
+        <div class="logo_usuario">
+            <img src="/img/usuario.png" alt="usuario">
+        </div>
+        <div class="formulario">
+            <form @submit.prevent="login">
+                <fieldset>
+                    <label for="">
+                        Usuario: 
+                    </label>
+                    <br>
+                    <input type="text" v-model="usuario" name="" id="">
+                    <br>
+                    <label for="">
+                        Contraseña: 
+                    </label>
+                    <br>
+                    <input type="password" v-model="contraseña" name="" id="">
+                    <br>
+                    <button id="Verificar" type="submit">
+                        Verificar
+                    </button>
+                </fieldset>          
+            </form>
+        </div>
+    </div> 
+</body>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script>
+const { createApp, ref } = Vue
+createApp({
+    setup() {
+    let usuario = ref('luis_manuel_parada_oliveros')
+    let contraseña = ref('123123')
+    let session_id = ref("")
+    let request_token = ref("")
+    let logeado = ref(false)
+    
+    return {
+        usuario, 
+        contraseña,
+        logeado,
+        session_id,
+        request_token
+    }
+    },
+    methods: {
+        login(){
+            var myHeaders = {"Authorization" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5Y2YxMTk4ZjM2NDEwZWEyMzg1MmMwMWMwYzQyNzczMSIsIm5iZiI6MTcyODY2NDkwMy40MjQ5MTIsInN1YiI6IjY3MDRjMWFlY2NiYjRlN2YxNjY5YmQxNyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.OW81sIJG9cm7Uoe6pJE73bddvkz007ilp8_kZZzatNM"}
+            var requestOptions = {
+            method: 'GET',
+            headers: myHeaders,
+            redirect: 'follow'
+            };
+
+            fetch("https://api.themoviedb.org/3/authentication/token/new?api_key=9cf1198f36410ea23852c01c0c427731", requestOptions)
+            .then(response => response.json())
+            .then(result => {
+                this.request_token = result.request_token
+                localStorage.setItem("request_token", this.request_token);
+                this.validarLogin();
+            })
+            .catch(error => console.log('error', error));
+        },
+        validarLogin(){
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+            const raw = JSON.stringify({
+                "username": this.usuario,
+                "password": this.contraseña,
+                "request_token": this.request_token
+            });
+
+            fetch("https://api.themoviedb.org/3/authentication/token/validate_with_login?api_key=9cf1198f36410ea23852c01c0c427731", {
+                method: "POST",
+                headers: myHeaders,
+                body: raw,
+                redirect: "follow"
+            })
+            .then((response) => response.json())
+            .then((result) => {
+                if(result.success){
+                    this.logeado = true;
+                    localStorage.setItem("logeado", this.logeado);
+                    localStorage.setItem("usuario", this.usuario);
+                    
+                    this.crear_Session_ID();
+                }else{
+                    alert("Error. Credenciales incorrectas");
+                }
+            })
+            .catch((error) => console.error(error));
+            
+        },
+        crear_Session_ID(){
+            console.log("estoy entrando al metodo que manda a llamar sesion id")
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+            var raw = JSON.stringify({
+            "request_token": this.request_token
+            });
+
+            var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: raw,
+            redirect: 'follow'
+            };
+
+            fetch("https://api.themoviedb.org/3/authentication/session/new?api_key=9cf1198f36410ea23852c01c0c427731", requestOptions)
+            .then(response => response.json())
+            .then(result =>{
+                this.session_id = result.session_id;
+                localStorage.setItem("session_id", this.session_id);
+                window.location.href = "home.html";
+            })
+            .catch(error => console.log('error', error));
+        }
+},
+mounted() { 
+		let logeado = localStorage.getItem("logeado");
+		let usuario = localStorage.getItem("usuario");
+        let request_token = localStorage.getItem("request_token");
+        let session_id = localStorage.getItem("session_id");
+        
+
+		if (logeado != null && usuario != null) { 
+		    window.location.href = "home.html";
+		}
+    }
+}).mount('#home')
+</script>
+
+</html>

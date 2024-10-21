@@ -1,0 +1,56 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #ffffff;
+    background-color: #1e1e1e;
+    margin: 0;
+    padding: 0;
+}
+
+#app {
+    text-align: center;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #ff4757;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.series-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.botonMas{
+    margin-top: 50px;
+}
+
+.serie {
+    background-color: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    width: 200px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.serie:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.serie img {
+    width: 100%;
+    border-bottom: 3px solid #2c51e1;
+}
+
+h2 {
+    font-size: 1.2rem;
+    margin: 10px 0;
+    padding: 0 10px;
+    color: #ffffff;
+}
+

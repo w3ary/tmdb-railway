@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles de la Película</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="/Style/navbar.css">
+    <link rel="stylesheet" href="/Style/movie.css">
+
+</head>
+
+<body>
+
+    <div id="app">
+
+        <div class="menu-superior">
+            <div class="d-flex justify-content-between align-items-center" style="height: 100%;">
+                <div class="opciones">
+                    <a href="./home.html">
+                        <img src="/img/Logo.png" class="logo">
+                    </a>
+
+
+                </div>
+
+                <div class="opciones-perfil">
+                    <div class="opciones-dropdown perfil-dropdown">
+                        <div class="button-perfil">
+                            <div class="icono-perfil">
+                                <img src="/img/perfil.png">
+                            </div>
+                        </div>
+                        <div class="dropdown-perfil">
+                            <li><a @click="cerrarSesion()">Cerrar sesión</a></li>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="app">
+            <div class="pelicula-container">
+                <img :src="'https://image.tmdb.org/t/p/original/' + pelicula_detalles.backdrop_path"
+                    alt="Backdrop de la Película" class="pelicula-container-img">
+
+                <div class="cuadro-transparente"></div>
+
+                <div class="portada">
+                    <img :src="'http://image.tmdb.org/t/p/w500' + pelicula.poster_path" alt="Poster de la Película">
+                </div>
+
+                <div class="resumen">
+                    <h1>{{ pelicula_detalles.title }}</h1>
+
+                    <div>
+                        <span v-for="(genero, index) in pelicula_detalles.genres" :key="index">
+                            <a href="#" class="generos" @click="guardarDatos(genero.id)">
+                                {{ genero.name }}
+                            </a>
+                            <span v-if="index < pelicula_detalles.genres.length - 1">, </span>
+                        </span>
+                    </div>
+
+
+                    <div class="rating-trailer-container">
+                        <div class="rating-circle">
+                            <span>{{ pelicula.rating !== undefined ? pelicula.rating : 0 }}</span>
+                        </div>
+
+                        <div class="play-trailer">
+                            <i class="icon-control-play" @click="mostrarTrailer"></i>
+                        </div>
+
+                    </div>
+
+
+                    <h3>Resumen</h3>
+                    <div class="resumen-texto">
+                        <p>{{ pelicula_detalles.overview }}</p>
+                    </div>
+
+                    <div class="boton-rating">
+                        <button @click="mostrarModal" class="btn btn-primary btn-lg">Añadir Rating</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="casting-container">
+                <h4>Casting</h4>
+                <div class="row">
+                    <div class="col-md-10">
+                        <div class="scroll-container">
+                            <div class="actor-card" v-for="(actor, index) in casting" :key="index">
+                                <img v-if="actor.profile_path" :src="actor.profile_path" alt="Imagen del Actor"
+                                    class="img-fluid">
+                                <img v-else src="/img/placeholder.png" alt="Sin imagen disponible" class="img-fluid">
+                                <h4>{{ actor.name }}</h4>
+                                <p>Rol: {{ actor.character }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 info-container">
+                        <h5>Palabras clave</h5>
+                        <div class="palabras-clave">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="btn-container">
+                                        <button @click="guardarClave(palabra.id)"
+                                            v-for="(palabra, index) in palabrasClave.slice(0, mitad_palabras_clave)"
+                                            :key="palabra.id" class="btn-palabra-clave">
+                                            <p>{{palabra.name}}</p>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="btn-container">
+                                        <button @click="guardarClave(palabra.id)"
+                                            v-for="(palabra, index) in palabrasClave.slice(mitad_palabras_clave)"
+                                            :key="palabra.id" class="btn-palabra-clave">
+                                            <p>{{palabra.name}}</p>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="recomendaciones-container">
+                        <h4>Películas Recomendadas</h4>
+                        <div class="row">
+                            <div class="col-md-10">
+                                <div class="scroll-container">
+                                    <div class="pelicula-card"
+                                        v-for="(pelicula_detalles, index) in peliculasRecomendadas" :key="index">
+                                        <img @click="guardarDatosPelicula(pelicula_detalles)"
+                                            v-if="pelicula_detalles.poster_path"
+                                            :src="'https://image.tmdb.org/t/p/w500' + pelicula_detalles.poster_path"
+                                            alt="Poster de la Película" class="img-fluid">
+                                        <h5>{{ pelicula_detalles.title }}</h5>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div id="ratingModal" class="modal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5>Selecciona tu calificación</h5>
+                            <button type="button" @click="cerrarModal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="range" v-model="rating" min="1" max="10" step="0.5" class="rating-slider">
+                            <p>Calificación: {{ rating }}</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" @click="cerrarModal" class="btn-custom">Cerrar</button>
+                            <button type="button" @click="anadirRating" class="btn-custom">Guardar Rating</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="trailerModal" class="modal">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Tráiler</h5>
+                            <button type="button" class="close" @click="cerrarTrailer">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <iframe v-if="trailerUrl" :src="trailerUrl" width="100%" height="400" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"></script>
+
+
+
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const perfilButton = document.querySelector('.button-perfil');
+        const dropdownMenu = document.querySelector('.perfil-dropdown .dropdown-perfil');
+
+        perfilButton.addEventListener('click', function () {
+            dropdownMenu.classList.toggle('active');
+        });
+
+        // Cerrar el dropdown si se hace clic fuera
+        document.addEventListener('click', function (e) {
+            if (!perfilButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.classList.remove('active');
+            }
+        });
+    });
+    const { createApp } = Vue;
+
+    createApp({
+        data() {
+            return {
+                pelicula: JSON.parse(localStorage.getItem('peliculaSeleccionada')) || {},
+                rating: 0,
+                pelicula_detalles: [],
+                generos: "",
+                casting: [],
+                palabrasClave: [],
+                peliculasRecomendadas: [],
+                contador_palabras_clave: 0,
+                mitad_palabras_clave: 0,
+                trailerUrl: "",
+                isFavorita: false,
+            };
+        },
+        methods: {
+
+            mostrarModal() {
+                this.rating = 0;
+                $('#ratingModal').modal('show');
+            },
+            cerrarModal() {
+                $('#ratingModal').modal('hide');
+            },
+            anadirRating() {
+                const sessionId = localStorage.getItem('session_id');
+                const peliculaId = this.pelicula.id;
+                const rating = this.rating;
+
+                try {
+                    const myHeaders = new Headers();
+
+                    myHeaders.append("Authorization", "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5Y2YxMTk4ZjM2NDEwZWEyMzg1MmMwMWMwYzQyNzczMSIsIm5iZiI6MTcyODY2NDkwMy40MjQ5MTIsInN1YiI6IjY3MDRjMWFlY2NiYjRlN2YxNjY5YmQxNyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.OW81sIJG9cm7Uoe6pJE73bddvkz007ilp8_kZZzatNM");
+                    myHeaders.append("Content-Type", "application/json;charset=utf-8");
+
+                    const bodyContent = JSON.stringify({
+                        value: rating
+                    });
+
+                    const requestOptions = {
+                        method: 'POST',
+                        headers: myHeaders,
+                        body: bodyContent,
+                        redirect: 'follow'
+                    };
+
+
+
+                    fetch(`https://api.themoviedb.org/3/movie/${peliculaId}/rating?api_key=9cf1198f36410ea23852c01c0c427731&session_id=${sessionId}`, requestOptions)
+                        .then(response => response.json())
+                        .then(result => {
+                            this.pelicula.rating = rating;
+                            this.cerrarModal();
+                        })
+                        .catch(error => console.log('error', error));
+
+
+                } catch (error) {
+                    console.error('Error en la solicitud:', error);
+                }
+            },
+            obtenerRating() {
+                let guest_session = localStorage.getItem('session_id');
+
+                fetch(`https://api.themoviedb.org/3/account/:account_id/rated/movies?session_id=${guest_session}&api_key=9cf1198f36410ea23852c01c0c427731`)
+                    .then(response => {
+                        return response.json();
+                    })
+                    .then(json => {
+                        let peliculaRating = json.results.find(peli => peli.id === this.pelicula.id);
+                        if (peliculaRating) {
+                            this.pelicula.rating = peliculaRating.rating;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error en la solicitud:', error);
+                    });
+            },
+
+
+            obtenerPelicula() {
+                fetch(`https://api.themoviedb.org/3/movie/${this.pelicula.id}?&api_key=9cf1198f36410ea23852c01c0c427731`)
+                    .then(response => {
+                        return response.json();
+                    })
+                    .then(json => {
+                        this.pelicula_detalles = json;
+                        this.generos = this.pelicula_detalles.genres.map(genero => genero.name).join(', ');
+                        console.log(this.pelicula_detalles)
+                    })
+                    .catch(error => {
+                        console.error('Error en la solicitud:', error);
+                    });
+            },
+
+            obtenerCasting() {
+                fetch(`https://api.themoviedb.org/3/movie/${this.pelicula.id}/credits?&api_key=9cf1198f36410ea23852c01c0c427731`)
+                    .then(response => {
+                        return response.json();
+                    })
+                    .then(json => {
+                        this.casting = json.cast.slice(0, 20).map(actor => ({
+                            name: actor.name,
+                            character: actor.character,
+                            profile_path: actor.profile_path ? `https://image.tmdb.org/t/p/w500${actor.profile_path}` : null,
+                        }));
+                    })
+                    .catch(error => {
+                        console.error('Error en la solicitud:', error);
+                    });
+            },
+
+            obtenerPalabrasClave() {
+                fetch(`https://api.themoviedb.org/3/movie/${this.pelicula.id}/keywords?api_key=9cf1198f36410ea23852c01c0c427731`)
+                    .then(response => response.json())
+                    .then(json => {
+                        json.keywords.forEach(keyword => {
+                            this.palabrasClave.push({ name: keyword.name, id: keyword.id });
+                            this.contador_palabras_clave++;
+                        });
+                        this.mitad_palabras_clave = Math.ceil(this.contador_palabras_clave / 2);
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener las palabras clave:', error);
+                    });
+            },
+
+            obtenerPeliculasRecomendadas() {
+                fetch(`https://api.themoviedb.org/3/movie/${this.pelicula.id}/recommendations?&api_key=9cf1198f36410ea23852c01c0c427731`)
+                    .then(response => response.json())
+                    .then(json => {
+                        this.peliculasRecomendadas = json.results.slice(0, 10);
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener las películas recomendadas:', error);
+                    });
+            },
+
+            mostrarTrailer() {
+                fetch(`https://api.themoviedb.org/3/movie/${this.pelicula.id}/videos?api_key=9cf1198f36410ea23852c01c0c427731`)
+                    .then(response => response.json())
+                    .then(json => {
+                        const trailer = json.results.find(video => video.type === 'Trailer');
+                        if (trailer) {
+                            this.trailerUrl = `https://www.youtube.com/embed/${trailer.key}`;
+                            $('#trailerModal').modal('show');
+                        } else {
+                            alert('No se encontró un tráiler para esta película.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener el tráiler:', error);
+                    });
+            },
+            cerrarTrailer() {
+                this.trailerUrl = "";
+                $('#trailerModal').modal('hide');
+            },
+            guardarClave(palabra_clave) {
+                localStorage.setItem('palabraClaveSeleccionada', JSON.stringify(palabra_clave));
+                window.location.href = 'palabra_clave.html';
+            },
+            guardarDatos(genero) {
+                localStorage.setItem('generoSeleccionado', JSON.stringify(genero));
+                window.location.href = 'generoMovie.html';
+            },
+            guardarDatosPelicula(pelicula) {
+                localStorage.setItem('peliculaSeleccionada', JSON.stringify(pelicula));
+                window.location.href = 'movie.html';
+            },
+
+            cerrarSesion() {
+                localStorage.removeItem("logeado")
+                localStorage.removeItem('usuario',);
+                localStorage.removeItem('session_id',);
+                localStorage.removeItem('request_token',);
+                window.location.href = 'index.html';
+            }
+        },
+        async mounted() {
+            let logeado = localStorage.getItem("logeado");
+            let usuario = localStorage.getItem("usuario");
+            let request_token = localStorage.getItem("request_token");
+            let session_id = localStorage.getItem("session_id");
+
+            if (logeado == null && usuario == null) {
+                window.location.href = "index.html";
+            }
+
+            this.obtenerPelicula();
+            this.obtenerCasting();
+            this.obtenerRating();
+            this.obtenerPalabrasClave();
+            this.obtenerPeliculasRecomendadas();
+
+
+        }
+    }).mount('#app');
+</script>
+
+</html>

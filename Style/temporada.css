@@ -1,0 +1,256 @@
+html,
+body {
+    overflow-x: hidden;
+    width: 100%;
+}
+
+
+.serie-container {
+    width: 100%;
+    height: 150px;
+    display: flex;
+    background-color: #424242;
+}
+
+
+
+.serie {
+    display: flex;
+    margin-left: 18%;
+    margin-right: 15%;
+    width: 100%;
+}
+
+.temporada-imagen img {
+    width: 100px;
+    height: 120px;
+    border-radius: 8px;
+    margin-top: 1vh;
+    cursor: pointer;
+}
+
+.temporada-informacion {
+    margin-top: 5vh;
+    margin-left: 60px;
+}
+
+.temporada-informacion h3 {
+    color: white;
+}
+
+
+.temporada-container {
+    width: 100%;
+    height: 150px;
+    display: flex;
+}
+
+
+
+.cambiar-temporada {
+    display: flexbox;
+    width: 100vw;
+    margin-left: 18%;
+    margin-right: 18vw;
+}
+
+.temporadas {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.flecha-con-texto {
+    display: flex;
+    align-items: center;
+    margin-bottom: 110px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.flecha-izquierda {
+    width: 12px;
+    height: 12px;
+    border-left: 3px solid black;
+    border-top: 3px solid black;
+    transform: rotate(-45deg);
+    margin-right: 8px;
+}
+
+.flecha-derecha {
+    width: 12px;
+    height: 12px;
+    border-left: 3px solid black;
+    border-top: 3px solid black;
+    transform: rotate(-225deg);
+    margin-left: -40px;
+}
+
+.temporada-siguiente {
+    margin-left: auto;
+    padding-right: 50px;
+}
+
+.temporada-anterior {
+    display: inline-block;
+}
+
+.episodios {
+    margin-left: 18vw;
+    margin-right: 15vw;
+}
+
+.carta-temporada {
+    display: flex;
+    flex-direction: row;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 1195px;
+    background-color: #fff;
+    margin-bottom: 20px;
+}
+
+
+.carta-imagen {
+    width: 227px;
+    height: 127px;
+    border-radius: 10px 0 0 10px;
+}
+
+.carta-cuerpo {
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    position: relative;
+    width: 100%;
+}
+
+
+.carta-titulo {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.btn-expandir {
+
+    border: none;
+    outline: none !important;
+    background-color: white;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+    text-align: center;
+    margin-top: 10px;
+
+}
+
+hr {
+    width: calc(100% - 20px);
+    margin: 10px 0;
+    border: 0;
+    border-top: 1px solid #ddd;
+    position: absolute;
+    bottom: 40px;
+}
+
+.btn-expandir:hover {}
+
+.carta-info-expandida {
+    font-size: 14px;
+    display: none;
+
+}
+
+.carta-info-expandida.expandido {
+    display: block;
+}
+
+.carta-calificacion {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.carta-calificacion span {
+    background-color: #3d9af7;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+.carta-episodios {
+    color: #666;
+    font-size: 14px;
+}
+
+.rating-fecha {
+    display: flex;
+}
+.carta-rating{
+    background-color: rgba(39, 148, 245, 0.8);
+    max-width: 68px;
+    min-width: 55px;
+    height: 20px;
+    border-radius: 5px;
+}
+
+.carta-rating h6{
+    font-size: 13px;
+    width: auto;
+}
+.carta-datos {
+    margin-left: 20px;
+    margin-top: 1px;
+}
+.carta-datos h6 {
+    font-size: 13px;
+}
+
+
+.carta-texto {
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+.carta-info-episodio {
+    font-size: 14px;
+    color: #333;
+}
+
+.carta-info-episodio a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+.estrella-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.estrella-img {
+    margin-right: 15px;
+}
+
+.estrella-detalles h6 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.estrella-detalles p {
+    margin: 0;
+    font-size: 14px;
+    color: gray;
+}
+
+.estrella-img img {
+    margin-bottom: 40px;
+    border-radius: 10px;
+    width: 66px;
+    height: 66px;
+}

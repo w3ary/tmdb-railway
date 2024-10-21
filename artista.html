@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Artista</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/Style/artista.css">
+    <link rel="stylesheet" href="/Style/navbar.css">
+</head>
+
+<body>
+    <div class="menu-superior">
+        <div class="d-flex justify-content-between align-items-center" style="height: 100%;">
+            <div class="opciones">
+                <a href="./home.html">
+                    <img src="/img/Logo.png" class="logo">
+                </a>
+            </div>
+
+            <div class="opciones-perfil">
+                <div class="opciones-dropdown perfil-dropdown">
+                    <div class="button-perfil">
+                        <div class="icono-perfil">
+                            <img src="/img/perfil.png">
+                        </div>
+                    </div>
+                    <div class="dropdown-perfil">
+                        <li><a @click="cerrarSesion()">Cerrar sesión</a></li>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="app" class="container mt-5">
+        <h1 class="text-center">Detalles del Artista</h1>
+
+        <div class="card" v-if="artista">
+            <div class="card-body">
+                <h2 class="card-title text-center">{{ artista.name }}</h2>
+                <img v-if="artista.profile_path" :src="'https://image.tmdb.org/t/p/w500/' + artista.profile_path" alt="Foto del Artista" class="img-fluid rounded mx-auto d-block mb-3">
+                <p><strong>Fecha de nacimiento:</strong> {{ artista.birthday || 'No disponible' }}</p>
+                <p><strong>Biografía:</strong></p>
+                <div class="biography p-3 bg-light rounded shadow-sm">{{ artista.biography || 'No hay biografía disponible.' }}</div>
+
+                <h3 class="mt-4">Películas donde ha participado</h3>
+                <div v-if="peliculas.length > 0" class="row">
+                    <div v-for="pelicula in peliculas" :key="pelicula.id" class="col-md-4 mb-3">
+                        <div class="card">
+                            <img v-if="pelicula.poster_path" :src="'https://image.tmdb.org/t/p/w200/' + pelicula.poster_path" alt="Póster de {{ pelicula.title }}" class="card-img-top">
+                            <div class="card-body">
+                                <p class="card-text">{{ pelicula.title }} ({{ pelicula.release_date ? pelicula.release_date.split('-')[0] : 'Fecha no disponible' }})</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div v-else>
+                    <p>No se encontraron películas para este artista.</p>
+                </div>
+            </div>
+        </div>
+
+        <div v-else>
+            <p>No se encontraron detalles para este artista.</p>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    artista: null,
+                    peliculas: []
+                };
+            },
+            methods: {
+                async obtenerDetallesArtista(artistaId) {
+                    let url = `https://api.themoviedb.org/3/person/${artistaId}?api_key=9cf1198f36410ea23852c01c0c427731&language=es-ES`;
+                    try {
+                        let response = await fetch(url);
+                        if (!response.ok) {
+                            throw new Error(`Error HTTP: ${response.status}`);
+                        }
+                        let data = await response.json();
+
+                        if (!data.biography) {
+                            console.log('Biografía no disponible en español, buscando en inglés...');
+                            url = `https://api.themoviedb.org/3/person/${artistaId}?api_key=9cf1198f36410ea23852c01c0c427731&language=en-US`;
+                            response = await fetch(url);
+                            if (!response.ok) {
+                                throw new Error(`Error HTTP: ${response.status}`);
+                            }
+                            data = await response.json();
+                        }
+
+                        this.artista = data;
+
+                        this.obtenerPeliculasArtista(artistaId);
+                    } catch (error) {
+                        console.error('Error al obtener los detalles del artista:', error.message);
+                    }
+                },
+                cerrarSesion() {
+                    localStorage.removeItem("logeado");
+                    localStorage.removeItem('usuario');
+                    localStorage.removeItem('session_id');
+                    localStorage.removeItem('request_token');
+                    window.location.href = 'index.html';
+                },
+
+                async obtenerPeliculasArtista(artistaId) {
+                    let url = `https://api.themoviedb.org/3/person/${artistaId}/movie_credits?api_key=9cf1198f36410ea23852c01c0c427731&language=es-ES`;
+                    try {
+                        let response = await fetch(url);
+                        if (!response.ok) {
+                            throw new Error(`Error HTTP: ${response.status}`);
+                        }
+                        let data = await response.json();
+
+                        this.peliculas = data.cast;
+                    } catch (error) {
+                        console.error('Error al obtener las películas del artista:', error.message);
+                    }
+                }
+            },
+            mounted() {
+                let logeado = localStorage.getItem("logeado");
+                let usuario = localStorage.getItem("usuario");
+                let request_token = localStorage.getItem("request_token");
+                let session_id = localStorage.getItem("session_id");
+
+                if (logeado == null && usuario == null) {
+                    window.location.href = "index.html";
+                }
+                const artistaId = localStorage.getItem('artistaSeleccionado');
+                if (artistaId) {
+                    this.obtenerDetallesArtista(artistaId);
+                } else {
+                    console.error('No se encontró el ID del artista en localStorage');
+                }
+            }
+        }).mount('#app');
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const perfilButton = document.querySelector('.button-perfil');
+            const dropdownMenu = document.querySelector('.perfil-dropdown .dropdown-perfil');
+    
+            perfilButton.addEventListener('click', function () {
+                dropdownMenu.classList.toggle('active');
+            });
+    
+            // Cerrar el dropdown si se hace clic fuera
+            document.addEventListener('click', function (e) {
+                if (!perfilButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                    dropdownMenu.classList.remove('active');
+                }
+            });
+        });
+    
+    </script>
+</body>
+
+</html>

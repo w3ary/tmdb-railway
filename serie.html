@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles de la Serie</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <link rel="stylesheet" href="/Style/serie.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/Style/navbar.css">
+
+</head>
+
+<body>
+
+    <div id="app">
+
+        <div class="menu-superior">
+            <div class="d-flex justify-content-between align-items-center" style="height: 100%;">
+                <div class="opciones">
+                    <a href="./home.html">
+                        <img src="/img/Logo.png" class="logo">
+                    </a>
+                  
+                   
+                </div>
+
+                <div class="opciones-perfil">
+                    <div class="opciones-dropdown perfil-dropdown">
+                        <div class="button-perfil">
+                            <div class="icono-perfil">
+                                <img src="/img/perfil.png">
+                            </div>
+                        </div>
+                        <div class="dropdown-perfil">
+                            <li><a @click="cerrarSesion()">Cerrar sesión</a></li>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="pelicula-container">
+            <img :src="'https://image.tmdb.org/t/p/original/' + pelicula_detalles.backdrop_path"
+                alt="Backdrop de la Película" class="pelicula-container-img">
+
+            <div class="portada">
+                <img :src="'http://image.tmdb.org/t/p/w500' + pelicula.poster_path" alt="Poster de la Película">
+            </div>
+
+
+            <div class="resumen">
+                <div class="titulo">
+                    <h1>{{ pelicula_detalles.original_name }}</h1>
+                    <h2> ({{pelicula.first_air_date}})</h2>
+
+                </div>
+
+                <div>
+                    <span v-for="(genero, index) in pelicula_detalles.genres" :key="index">
+                        <a href="#" class="genero" @click="guardarDatos(genero.id)">
+                            {{ genero.name }}
+                        </a>
+                        <span v-if="index < pelicula_detalles.genres.length - 1">, </span>
+                    </span>
+                </div>
+
+                <div class="container-datos">
+
+                    <!--<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                        Launch demo modal
+                    </button> -->
+                    <div class="botones">
+                        <div v-if="video_existe" class="trailer">
+                            <button type="button" class="btn-trailer" data-toggle="modal" data-target="#exampleModal">
+                                <div class="btn-trailer-icono">
+                                    <img src="/img/icono_play.svg" alt="">
+                                </div>
+                            </button>
+                            <h5>Reproducir trailer</h5>
+                        </div>
+                        <button type="button" class="btn-guardar">
+                            <div v-if="esta_en_watchlist == false" class="btn-guardar-icono">
+                                <img @click="anadir_watchlist()" src="/img/icon/icono_guardar.png" alt="">
+                            </div>
+                            <div v-else class="btn-guardar-icono">
+                                <img src="/img/icon/icono_guardado.png" alt="">
+                            </div>
+                        </button>
+                        <div class="rating-circle">
+                            <span>{{ pelicula.rating !== undefined ? pelicula.rating : 0 }}</span>
+                        </div>
+
+                    </div>
+
+
+
+
+
+                    <div class="informacion-pelicula">
+
+                        <h3>Resumen</h3>
+
+                        <div class="resumen-texto">
+                            <p>{{ pelicula_detalles.overview }}</p>
+
+
+                        </div>
+                        <div class="creador">
+                            <div class="creador-nombre" v-for="(actor, index) in casting" :key="index">
+                                <p style="font-weight: bold;">{{actor.name}}</p>
+                                <p>{{actor.job}}</p>
+
+                            </div>
+
+
+                        </div>
+
+                        <div class="boton-rating">
+                            <button @click="mostrarModal" class="btn btn-primary btn-lg">Añadir Rating</button>
+                           
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+        <div class="casting-container">
+            <h4>Casting</h4>
+            <div class="row">
+                <div class="col-md-10">
+                    <!-- CASTING Y TEMPORADAS -->
+                    <div class="scroll-container">
+                        <div class="actor-card" v-for="(actor, index) in actores" :key="index">
+                            <img @click="guardar_artista(actor.id)" v-if="actor.profile_path" :src="actor.profile_path"
+                                alt="Imagen del Actor" class="img-fluid">
+                            <img v-else src="/img/placeholder.png" alt="Sin imagen disponible" class="img-fluid">
+                            <h4>{{ actor.name }}</h4>
+                            <p>Rol: {{ actor.character }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PANEL DERECHO -->
+                <div class="col-md-2 info-container">
+                    <div class="panel-derecho">
+                        <h3>Información Extra</h3>
+                        <div class="redes-sociales">
+                            <h5 v-if="redes_contador > 0">Redes sociales</h5>
+                            <div class="iconos-container">
+                                <div v-if="facebook">
+                                    <a :href="'https://www.facebook.com/' + facebook_link" target="_blank">
+                                        <img src="/img/icon/icono_facebook.png" alt="facebook" class="red-social-icono">
+                                    </a>
+                                </div>
+                                <div v-if="twitter">
+                                    <a :href="'https://www.twitter.com/' + twitter_link" target="_blank">
+                                        <img src="/img/icon/icono_twitter.png" alt="twitter" class="red-social-icono">
+                                    </a>
+                                </div>
+                                <div v-if="instagram">
+                                    <a :href="'https://www.instagram.com/' + instagram_link" target="_blank">
+                                        <img src="/img/icon/icono_instagram.png" alt="instagram"
+                                            class="red-social-icono">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5>Palabras clave</h5>
+                        <div v-if="contador_palabras_clave > 0" class="palabras-clave">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="btn-container">
+                                        <button @click="guardar_id_palabra_clave(palabra.id)"
+                                            v-for="(palabra, index) in palabras_clave.slice(0, mitad_palabras_clave)"
+                                            :key="palabra.id" class="btn-palabra-clave">
+                                            <p>{{palabra.name}}</p>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="btn-container">
+                                        <button @click="guardar_id_palabra_clave(palabra.id)"
+                                            v-for="(palabra, index) in palabras_clave.slice(mitad_palabras_clave)"
+                                            :key="palabra.id" class="btn-palabra-clave">
+                                            <p>{{palabra.name}}</p>
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div v-else>
+                            <p>No hay palabras clave</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-10">
+                    <h4>Ultima temporada</h4>
+                    <div class="carta-temporada" v-for="temporada in ultima_temporada" :key="temporada.id">
+                        <img @click="guardar_numero_temporada(temporada.season_number)" class="carta-imagen"
+                            :src="'https://image.tmdb.org/t/p/w500/' + temporada.poster_path" alt="poster">
+                        <div class="carta-cuerpo">
+                            <div>
+                                <h2 class="carta-titulo">{{temporada.name}}</h2>
+                                <div class="carta-calificacion">
+                                    <span>⭐ {{rating_ultima_temporada}}%</span>
+                                    <div class="carta-episodios">{{temporada.air_date}} • {{temporada.episodes.length}}
+                                        episodios</div>
+                                </div>
+                                <div v-if="ultima_temporada_existe_overview">
+                                    <p class="carta-texto">{{temporada.overview}}</p>
+
+                                </div>
+                                <div v-else>
+                                    <p class="carta-texto">Aún no hay una descripción...</p>
+
+                                </div>
+
+                            </div>
+                            <div v-for="episodio in ultimo_episodio" :key="episodio.id" class="carta-info-episodio">
+                                <span>📅 </span><a>Episodio {{episodio.episode_number}}
+                                    ({{temporada.season_number}}x{{episodio.episode_number}}, {{episodio.air_date}})</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="row">
+                <div class="col-md-10">
+                    <h4>Series recomendadas</h4>
+                    <!-- PELICULAS RECOMENDADAS -->
+                    <div class="scroll-container">
+                        <div class="actor-card" v-for="(serie, index) in series_recomendadas" :key="index">
+                            <img v-if="serie.poster_path" @click="guardar_serie(serie)"
+                                :src="'https://image.tmdb.org/t/p/original/' + serie.poster_path" alt="Imagen de serie"
+                                class="img-fluid">
+                            <img v-else src="/img/placeholder.png" alt="Sin imagen disponible" class="img-fluid">
+                            <h4>{{ serie.name }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+        <div class="modal fade" id="ratingModal" tabindex="-1" role="dialog" aria-labelledby="ratingModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-dark" id="ratingModalLabel">Selecciona tu calificación</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                            @click="cerrarModal">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="range" id="rating" v-model="rating" min="1" max="10" step="0.5" class="slider">
+                        <p class="text-dark">Calificación: {{ rating }}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="cerrarModal">Cerrar</button>
+                        <button type="button" class="btn btn-primary" @click="anadirRating">Guardar Rating</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="embed-responsive embed-responsive-16by9">
+                            <iframe id="yt-player" class="embed-responsive-item"
+                                :src="'https://www.youtube.com/embed/' + serie_video_src + '?enablejsapi=1'"
+                                allowfullscreen></iframe>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"></script>
+
+
+
+
+
+</body>
+
+
+<script>
+    const { createApp } = Vue;
+
+    createApp({
+        data() {
+            return {
+                pelicula: JSON.parse(localStorage.getItem('serieSeleccionada')) || {},
+                rating: 0,
+                pelicula_detalles: [],
+                generos: "",
+                casting: [],
+                actores: [],
+                serie_videos: [], video_existe: true,
+                redes_sociales: [], facebook_link: "", twitter_link: "", instagram_link: "", redes_contador: 0, //Si hay al menos una red, mostrar el texto de redes sociales con el contador
+                facebook: false, twitter: false, instagram: false, //Si son ture, entonces mostrar sus imagenes en el html
+                palabras_clave: [], contador_palabras_clave: 0, mitad_palabras_clave: 0, //Para llenar las columnas de las palabras clave por igual
+                temporadas: [], numero_temporada: 1,
+                ultima_temporada: [], rating_ultima_temporada: 0, ultima_temporada_existe_overview: true,
+                ultimo_episodio: [],
+                series_recomendadas: [],
+                cuenta_id: "",
+                esta_en_watchlist: false,
+                serie_video_src: "",
+                contador_modal: 0,
+                modal_bandera: false
+            };
+        },
+        methods: {
+            mostrarModal() {
+                this.rating = 0;
+                $('#ratingModal').modal('show');
+            },
+            cerrarModal() {
+                $('#ratingModal').modal('hide');
+            },
+
+            async anadirRating() {
+                const sessionId = localStorage.getItem('session_id');
+                const peliculaId = this.pelicula.id;
+                const rating = this.rating;
+                console.log("sessionid: " + sessionId)
+                console.log("peliculaid: " + peliculaId)
+                console.log("rating: " + rating)
+
+                if (!sessionId || !peliculaId || !rating) {
+                    console.error('Faltan datos necesarios para añadir el rating.');
+                    return;
+                }
+
+                try {
+                    const myHeaders = new Headers();
+                    myHeaders.append("Authorization", "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5Y2YxMTk4ZjM2NDEwZWEyMzg1MmMwMWMwYzQyNzczMSIsIm5iZiI6MTcyODY2NDkwMy40MjQ5MTIsInN1YiI6IjY3MDRjMWFlY2NiYjRlN2YxNjY5YmQxNyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.OW81sIJG9cm7Uoe6pJE73bddvkz007ilp8_kZZzatNM");
+                    myHeaders.append("Content-Type", "application/json;charset=utf-8");
+
+                    const raw = JSON.stringify({
+                        value: rating
+                    });
+
+                    const requestOptions = {
+                        method: 'POST',
+                        headers: myHeaders,
+                        body: raw,
+                        redirect: 'follow'
+                    };
+
+                    const response = await fetch(`https://api.themoviedb.org/3/tv/${peliculaId}/rating?session_id=${sessionId}`, requestOptions);
+                    const result = await response.json();
+
+                    if (result.success) {
+                        console.log("Rating añadido con éxito:", result);
+                        this.pelicula.rating = rating
+                        this.cerrarModal();
+                    } else {
+                        console.error("Error al añadir el rating:", result);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            },
+            async obtener_rating() {
+                let guest_session = localStorage.getItem('session_id');
+                const url = `https://api.themoviedb.org/3/account/:account_id/rated/tv?session_id=${guest_session}&api_key=9cf1198f36410ea23852c01c0c427731`;
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error(`Response status: ${response.status}`);
+                    }
+                    const json = await response.json();
+                    const peliculaRating = json.results.find(p => p.id === this.pelicula.id);
+
+                    if (peliculaRating) {
+                        this.pelicula.rating = peliculaRating.rating;
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            },
+            async obtener_pelicula() {
+                const url = `https://api.themoviedb.org/3/tv/${this.pelicula.id}?&api_key=9cf1198f36410ea23852c01c0c427731`;
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error(`Response status: ${response.status}`);
+                    }
+                    const json = await response.json();
+
+                    this.pelicula_detalles = json;
+                    this.generos = this.pelicula_detalles.genres.map(genero => genero.name).join(',  ');
+                } catch (error) {
+                    console.error(error);
+                }
+            },
+            async obtener_casting() {
+                const url = `https://api.themoviedb.org/3/tv/${this.pelicula.id}/credits?&api_key=9cf1198f36410ea23852c01c0c427731`;
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error(`Response status: ${response.status}`);
+                    }
+                    const json = await response.json();
+                    //Mostrar a los productores como creadores
+                    this.casting = json.crew
+                        .filter(persona => persona.job === "Executive Producer")
+
+
+                        .slice(0, 2)
+                        .map(producer => ({
+                            name: producer.name,
+                            job: "Creador"
+                        }));
+                } catch (error) {
+                    console.error(error);
+                }
+            },
+
+            obtener_actores() {
+                fetch(`https://api.themoviedb.org/3/tv/${this.pelicula.id}/credits?&api_key=9cf1198f36410ea23852c01c0c427731`)
+                    .then(response => {
+                        return response.json();
+                    })
+                    .then(json => {
+                        this.actores = json.cast.slice(0, 20).map(actor => ({
+                            name: actor.name,
+                            character: actor.character,
+                            id: actor.id,
+                            profile_path: actor.profile_path ? `https://image.tmdb.org/t/p/w500${actor.profile_path}` : null,
+                        }));
+                    })
+                    .catch(error => {
+                        console.error('Error en la solicitud:', error);
+                    });
+            },
+
+            async obtener_video() {
+                const url = `https://api.themoviedb.org/3/tv/${this.pelicula.id}/videos?&api_key=9cf1198f36410ea23852c01c0c427731`;
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error(`Response status: ${response.status}`);
+                    }
+                    const json = await response.json();
+
+                    json.results.forEach(pelicula => {
+
+                        this.serie_videos.push(pelicula);
+                    });
+
+                    const bandera = false
+
+                    this.serie_videos.forEach(element => {
+                        if (element.type == "Trailer" && bandera == false) {
+                            console.log("Video: " + element.key);
+                            this.serie_video_src = element.key;
+                            console.log("Video: " + this.serie_video_src);
+
+                            bandera = true
+
+                        }
+
+                    });
+                    console.log("Video: " + this.serie_video_src);
+
+                    if (this.serie_video_src == "") {
+                        this.video_existe = false;
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+
+            },
+            async obtener_redes_sociales() {
+                const url = `https://api.themoviedb.org/3/tv/${this.pelicula.id}/external_ids?&api_key=9cf1198f36410ea23852c01c0c427731`;
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error(`Response status: ${response.status}`);
+                    }
+                    const json = await response.json();
+
+                    this.redes_sociales = [];
+
+                    //Se agregan las redes si existen
+                    if (json.facebook_id) {
+                        this.facebook = true;
+                        this.redes_sociales.push({ name: "Facebook", id: json.facebook_id });
+                    }
+                    if (json.instagram_id) {
+                        this.instagram = true;
+                        this.redes_sociales.push({ name: "Instagram", id: json.instagram_id });
+                    }
+                    if (json.twitter_id) {
+                        this.twitter = true;
+                        this.redes_sociales.push({ name: "Twitter", id: json.twitter_id });
+                    }
+
+                    this.redes_sociales.forEach(red_social => {
+                        console.log("red: " + red_social.id)
+                        if (red_social.name = "Facebook") {
+                            this.facebook_link = red_social.id;
+                            this.redes_contador++;
+                        }
+                        if (red_social.name = "Twitter") {
+                            this.twitter_link = red_social.id;
+                            this.redes_contador++;
+
+                        }
+                        if (red_social.name = "Instagram") {
+                            this.instagram_link = red_social.id;
+                            this.redes_contador++;
+
+                        }
+
+                    });
+                    console.log(this.facebook_link)
+
+                } catch (error) {
+                    console.error(error);
+                }
+            },
+            async obtener_palabras_clave() {
+                const url = `https://api.themoviedb.org/3/tv/${this.pelicula.id}/keywords?api_key=9cf1198f36410ea23852c01c0c427731`;
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error(`Response status: ${response.status}`);
+                    }
+                    const json = await response.json();
+
+                    json.results.forEach(palabra_clave => {
+                        this.palabras_clave.push({ name: palabra_clave.name, id: palabra_clave.id })
+                        this.contador_palabras_clave++;
+                    });
+                    this.mitad_palabras_clave = this.contador_palabras_clave / 2; //Se asigna la mitad de las palabras a la primer columna
+                    this.palabras_clave.forEach(element => {
+                        console.log("palabra clave: " + element.name)
+
+                    });
+
+                } catch (error) {
+                    console.error(error);
+                }
+            },
+            async obtener_temporadas() {
+                let continuar = true;
+                let ultimo_episodio_encontrado = false;
+
+                while (continuar) {
+                    const url = `https://api.themoviedb.org/3/tv/${this.pelicula.id}/season/${this.numero_temporada}?api_key=9cf1198f36410ea23852c01c0c427731`;
+                    try {
+                        const response = await fetch(url);
+                        if (!response.ok) {
+                            throw new Error(`Response status: ${response.status}`);
+                        }
+                        const json = await response.json();
+
+                        if (json && json.id) {
+                            //Si hay datos de la temporada, se agregan al array
+                            this.temporadas.push(json);
+                            this.ultima_temporada = []; //Se limpia el contenido de la temporada para que solo almacene la última
+                            this.ultima_temporada.push(json);
+                            this.numero_temporada++;
+                        } else {
+                            continuar = false; //Si no hay más temporadas, detener el ciclo
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        this.temporadas.forEach(temporada => {
+                            console.log("Temporada: " + temporada.name)
+
+                        });
+                        this.ultima_temporada.forEach(temporada => {
+                            this.rating_ultima_temporada = Math.round(temporada.vote_average * 100) / 10;
+                            console.log("runtime: " + temporada.episodes.runtime)
+                            if (temporada.overview == "") {
+                                this.ultima_temporada_existe_overview = false;
+                            }
+                            temporada.episodes.forEach(episodio => {
+
+                                if (episodio.runtime == null && ultimo_episodio_encontrado == false) {
+                                    console.log("ENTRO AL IF DEL ULTIMO EPISODIO")
+                                    this.ultimo_episodio.push(episodio)
+                                    ultimo_episodio_encontrado = true;
+                                }
+                            });
+                        });
+                        this.ultimo_episodio.forEach(element => {
+                            console.log("Ultimo capitulo: " + element.name)
+
+                        });
+                        continuar = false; //En caso de error, detener el ciclo
+                    }
+
+                }
+            },
+            obtenerSeriesRecomendadas() {
+                fetch(`https://api.themoviedb.org/3/tv/${this.pelicula.id}/recommendations?&api_key=9cf1198f36410ea23852c01c0c427731`)
+                    .then(response => response.json())
+                    .then(json => {
+                        this.series_recomendadas = json.results.slice(0, 10);
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener las películas recomendadas:', error);
+                    });
+            },
+            async obtener_id_cuenta() {
+                const id_sesion = localStorage.getItem("session_id");
+                const url = `https://api.themoviedb.org/3/account?api_key=9cf1198f36410ea23852c01c0c427731&session_id=${id_sesion}`;
+
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error(`Response status: ${response.status}`);
+                    }
+                    const json = await response.json();
+
+                    const id_cuenta = json.id;
+                    this.cuenta_id = json.id;
+                    console.log(`ID de la cuenta: ${id_cuenta}`);
+
+                } catch (error) {
+                    console.error(error);
+                }
+            },
+            async anadir_watchlist() {
+                const sessionId = localStorage.getItem('session_id');
+                const cuentaId = this.cuenta_id;
+                const peliculaId = this.pelicula.id;
+                const watchlist = true;
+
+                this.esta_en_watchlist = true;
+                localStorage.setItem(`watchlist_${peliculaId}`, true); 
+
+                if (!sessionId || !cuentaId || !peliculaId) {
+                    console.error('Faltan datos necesarios para añadir a la watchlist.');
+                    return;
+                }
+
+                try {
+                    const myHeaders = new Headers();
+                    myHeaders.append("Authorization", "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5Y2YxMTk4ZjM2NDEwZWEyMzg1MmMwMWMwYzQyNzczMSIsIm5iZiI6MTcyODY2NDkwMy40MjQ5MTIsInN1YiI6IjY3MDRjMWFlY2NiYjRlN2YxNjY5YmQxNyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.OW81sIJG9cm7Uoe6pJE73bddvkz007ilp8_kZZzatNM");
+                    myHeaders.append("Content-Type", "application/json;charset=utf-8");
+
+                    const raw = JSON.stringify({
+                        media_type: "tv",
+                        media_id: peliculaId,
+                        watchlist: watchlist
+                    });
+
+                    const requestOptions = {
+                        method: 'POST',
+                        headers: myHeaders,
+                        body: raw,
+                        redirect: 'follow'
+                    };
+
+                    const url = `https://api.themoviedb.org/3/account/${cuentaId}/watchlist?session_id=${sessionId}`;
+                    const response = await fetch(url, requestOptions);
+                    const result = await response.json();
+
+                    if (result.success) {
+                        console.log("Serie añadida a la watchlist con éxito:", result);
+                    } else {
+                        console.error("Error al añadir la serie a la watchlist:", result);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            },
+            guardarDatos(genero) {
+                localStorage.setItem('generoSeleccionado', JSON.stringify(genero));
+                window.location.href = 'genero.html';
+            },
+            guardar_id_palabra_clave(palabra_clave) {
+                localStorage.setItem('palabraClaveSeleccionada', JSON.stringify(palabra_clave));
+                window.location.href = 'palabra_clave_serie.html';
+            },
+            guardar_numero_temporada(temporada) {
+                localStorage.setItem('temporadaSeleccionada2', temporada);
+                localStorage.setItem('serieSeleccionadaId', this.pelicula.id)
+                window.location.href = 'temporada.html';
+            },
+            guardar_artista(artista) {
+                localStorage.setItem('artistaSeleccionado', artista)
+                window.location.href = 'artista.html';
+            },
+            guardar_serie(serie) {
+                localStorage.setItem('serieSeleccionada', JSON.stringify(serie));
+                window.location.href = 'serie.html';
+            },
+            cerrarSesion() {
+                localStorage.removeItem("logeado")
+                localStorage.removeItem('usuario',);
+                localStorage.removeItem('session_id',);
+                localStorage.removeItem('request_token',);
+                window.location.href = './index.html';
+            }
+        },
+        async mounted() {
+            await this.obtener_video()
+            let logeado = localStorage.getItem("logeado");
+            let usuario = localStorage.getItem("usuario");
+            let request_token = localStorage.getItem("request_token");
+            let session_id = localStorage.getItem("session_id");
+
+
+            if (logeado == null && usuario == null) {
+                window.location.href = "index.html";
+            }
+            console.log(this.pelicula.id)
+            this.obtener_pelicula();
+            this.obtener_casting();
+            this.obtener_actores();
+            this.obtener_redes_sociales();
+            this.obtener_palabras_clave();
+            this.obtener_rating();
+            this.obtener_temporadas();
+            this.obtenerSeriesRecomendadas();
+            this.obtener_id_cuenta()
+
+            const peliculaId = this.pelicula.id;
+            const watchlistState = localStorage.getItem(`watchlist_${peliculaId}`);
+
+            if (watchlistState !== null) {
+                this.esta_en_watchlist = JSON.parse(watchlistState);  
+            } else {
+                this.esta_en_watchlist = false;  
+            }
+
+        }
+    }).mount('#app');
+</script>
+<script type="text/javascript">
+    $('#exampleModal').on('hidden.bs.modal', function () {
+        callPlayer('yt-player', 'stopVideo');
+    });
+
+    function callPlayer(playerId, parar_video) {
+        const player = document.getElementById(playerId);
+        if (player && player.contentWindow) {
+            player.contentWindow.postMessage('{"event":"command","func":"' + parar_video + '","args":""}', '*');
+        }
+    }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const perfilButton = document.querySelector('.button-perfil');
+        const dropdownMenu = document.querySelector('.perfil-dropdown .dropdown-perfil');
+
+        perfilButton.addEventListener('click', function () {
+            dropdownMenu.classList.toggle('active');
+        });
+
+        // Cerrar el dropdown si se hace clic fuera
+        document.addEventListener('click', function (e) {
+            if (!perfilButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.classList.remove('active');
+            }
+        });
+    });
+
+</script>
+
+
+
+</html>

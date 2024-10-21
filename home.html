@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home</title>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="/Style/navbar.css">
+  <link rel="stylesheet" href="/Style/estilo.css">
+</head>
+
+<body>
+  <div class="" id="home">
+    <div class="menu-superior">
+
+      <div class="d-flex justify-content-between align-items-center" style="height: 100%;">
+        <div class="opciones">
+          <a href="./home.html">
+            <img src="/img/Logo.png" class="logo">
+          </a>
+          <div class="opciones-dropdown">
+            <h4>Películas</h4>
+            <div class="dropdown">
+              <li><a href="./Listas/Lista_Peliculas/movies_popular.html">Populares</a></li>
+              <li><a href="./Listas/Lista_Peliculas/movies_cartelera.html">En cartelera</a></li>
+              <li><a href="./Listas/Lista_Peliculas/movies_rating.html">Mejor calificados</a></li>
+            </div>
+          </div>
+          <div class="opciones-dropdown">
+            <h4>Series de TV</h4>
+            <div class="dropdown">
+              <li><a href="./Listas/Lista_series/series_popular.html">Populares</a></li>
+              <li><a href="./Listas/Lista_series/series_rating.html">Mejor calificados</a></li>
+            </div>
+          </div>
+
+
+        </div>
+
+        <div class="opciones-perfil">
+          <div class="opciones-dropdown perfil-dropdown">
+            <div class="button-perfil">
+              <div class="icono-perfil">
+                <img src="/img/perfil.png">
+              </div>
+            </div>
+            <div class="dropdown-perfil">
+              <li><a @click="cerrarSesion()">Cerrar sesión</a></li>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="banner" :style="{ backgroundImage: 'url(' + img_Fondo + ')' }">
+        <div class="titulos">
+          <h1>
+            Te damos la bienvenida.
+          </h1>
+          <h3>
+            Millones de películas, series y gente por descubrir. Explora ya.
+          </h3>
+        </div>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Buscar una película, serie, persona..."
+            aria-label="buscador" aria-describedby="basic-addon2">
+          <div class="input-group-append">
+            <button class="btn btn-outline" type="button" @click="peliculas()">Search</button>
+          </div>
+        </div>
+      </div>
+      <div class="tendencias">
+        <h3>
+          Tendencias
+          <button>
+            Esta semana
+          </button>
+        </h3>
+        <div id="main-popular">
+          <div class="container-fluid py-2">
+            <div class="d-flex flex-row flex-nowrap">
+              <div v-for="pelicula in peliculas_Trending" :key="pelicula.id" class="card card-body">
+                <img @click="guardarDatos(pelicula)"
+                  v-bind:src="'https://media.themoviedb.org/t/p/w500' + pelicula.poster_path">
+                <h5>{{pelicula.title}}</h5>
+                <p>{{pelicula.release_date}}</p>
+                <div class="rating-container">
+                  <p>{{pelicula.vote_average * 10}}%</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="popular">
+        <h3>
+          Lo más popular
+          <button>
+            En cines
+          </button>
+        </h3>
+        <div id="main-popular">
+          <div class="container-fluid py-2">
+            <div class="d-flex flex-row flex-nowrap">
+              <div v-for="pelicula in peliculas_Cartelera" :key="pelicula.id" class="card card-body">
+                <img @click="guardarDatos(pelicula)"
+                  v-bind:src="'https://media.themoviedb.org/t/p/w500' + pelicula.poster_path">
+                <h5>{{pelicula.title}}</h5>
+                <p>{{pelicula.release_date}}</p>
+                <div class="rating-container">
+                  <p>{{pelicula.vote_average * 10}}%</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="gratis">
+        <h3>
+          Ver gratis
+          <button>
+            Películas
+          </button>
+        </h3>
+        <div id="main-popular" v-if="peliculas_Gratis.length >= 5">
+          <div class="container-fluid py-2">
+            <div class="d-flex flex-row flex-nowrap">
+              <div v-for="pelicula in peliculas_Gratis" :key="pelicula.id" class="card card-body">
+                <img @click="guardarDatos(pelicula)"
+                  v-bind:src="'https://media.themoviedb.org/t/p/w500' + pelicula.poster_path">
+                <h5>{{pelicula.title}}</h5>
+                <p>{{pelicula.release_date}}</p>
+                <div class="rating-container">
+                  <p>{{pelicula.vote_average * 10}}%</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cargando" v-else>
+          <h1>
+            Cargando peliculas
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
+          </h1>
+        </div>
+      </div>
+
+      <div class="popular-series">
+        <h3>
+          Lo más popular en series
+          <button>
+            Esta semana
+          </button>
+        </h3>
+        <div id="main-popular">
+          <div class="container-fluid py-2">
+            <div class="d-flex flex-row flex-nowrap">
+              <div v-for="serie in series_Trending" :key="serie.id" class="card card-body">
+                <img @click="guardarDatosSerie(serie)"
+                  v-bind:src="'https://media.themoviedb.org/t/p/w500' + serie.poster_path">
+                <h5>{{serie.original_name}}</h5>
+                <p>{{serie.first_air_date}}</p>
+                <div class="rating-container">
+                  <p>{{serie.vote_average * 10}}%</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script>
+  //Podría ir en la carpeta de Scripts
+  document.addEventListener('DOMContentLoaded', function () {
+    const perfilButton = document.querySelector('.button-perfil');
+    const dropdownMenu = document.querySelector('.perfil-dropdown .dropdown-perfil');
+
+    perfilButton.addEventListener('click', function () {
+      dropdownMenu.classList.toggle('active');
+    });
+
+    // Cerrar el dropdown si se hace clic fuera
+    document.addEventListener('click', function (e) {
+      if (!perfilButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
+        dropdownMenu.classList.remove('active');
+      }
+    });
+  });
+
+
+  const { createApp, ref } = Vue
+  createApp({
+    setup() {
+      peliculas_Trending = ref([]);
+      series_Trending = ref([]);
+      peliculas_Cartelera = ref([]);
+      peliculas_Popular = ref([]);
+      peliculas_Gratis = ref([]);
+      let img_Fondo = ref("");
+
+      return {
+        peliculas_Trending,
+        peliculas_Cartelera,
+        peliculas_Popular,
+        peliculas_Gratis,
+        series_Trending,
+        img_Fondo
+      }
+    },
+    methods: {
+      guardarDatos(pelicula) {
+        localStorage.setItem('peliculaSeleccionada', JSON.stringify(pelicula));
+        window.location.href = 'movie.html';
+      },
+      guardarDatosSerie(serie) {
+        localStorage.setItem('serieSeleccionada', JSON.stringify(serie));
+        window.location.href = 'serie.html';
+      },
+      cerrarSesion() {
+        localStorage.removeItem("logeado")
+        localStorage.removeItem('usuario',);
+        localStorage.removeItem('session_id',);
+        localStorage.removeItem('request_token',);
+        window.location.href = 'index.html';
+      }
+    },
+    mounted() {
+      let logeado = localStorage.getItem("logeado");
+      let usuario = localStorage.getItem("usuario");
+      let request_token = localStorage.getItem("request_token");
+      let session_id = localStorage.getItem("session_id");
+
+
+      if (logeado == null && usuario == null) {
+        window.location.href = "index.html";
+      }
+
+      // FETCH PARA OBTENER LAS TENDENCIAS DE LA SEMANA
+      const requestOptions = {
+        method: "GET",
+        redirect: "follow"
+      };
+      fetch("https://api.themoviedb.org/3/trending/movie/week?language=es-MX&api_key=9cf1198f36410ea23852c01c0c427731", requestOptions)
+        .then((response) => response.json())
+        .then((result) => {
+          this.peliculas_Trending = result.results;
+          this.img_Fondo = "https://media.themoviedb.org/t/p/w1280_and_h720_face/" + this.peliculas_Trending[Math.floor(Math.random() * 20)].backdrop_path;
+        })
+        .catch((error) => console.error(error));
+
+
+      // FETCH PARA OBTENER LO POPULAR EN CINES
+      const requestOptions2 = {
+        method: "GET",
+        redirect: "follow"
+      };
+      fetch("https://api.themoviedb.org/3/movie/now_playing?language=es-MX&api_key=9cf1198f36410ea23852c01c0c427731&sort_by=vote_average.desc", requestOptions2)
+        .then((response) => response.json())
+        .then((result) => {
+          this.peliculas_Cartelera = result.results;
+        })
+        .catch((error) => console.error(error));
+
+
+      // FETCH PARA OBTENER LAS PELICULAS GRATIS
+      let pagina = 1;
+      const max_pag = 150;
+
+      const obtenerPeliculasGratis = () => {
+        if (this.peliculas_Gratis.length >= 20 || pagina > max_pag) return;
+
+        fetch(
+          "https://api.themoviedb.org/3/movie/popular?api_key=9cf1198f36410ea23852c01c0c427731&language=es-MX&page=" + pagina
+        )
+          .then((response) => response.json())
+          .then((peliculas) => {
+            const promesas = peliculas.results.map((pelicula) =>
+              fetch(
+                "https://api.themoviedb.org/3/movie/" + pelicula.id + "/watch/providers?api_key=9cf1198f36410ea23852c01c0c427731"
+              )
+                .then((response) => response.json())
+                .then((provedores) => {
+                  const provedoresInfo = provedores.results?.["MX"];
+                  if (provedoresInfo?.free) {
+                    this.peliculas_Gratis.push(pelicula);
+                  }
+                })
+                .catch((error) => console.error(error))
+            );
+            return Promise.all(promesas);
+          })
+          .then(() => {
+            pagina++;
+            obtenerPeliculasGratis();
+          })
+          .catch((error) => console.error(error));
+      };
+      obtenerPeliculasGratis();
+
+      // FETCH PARA OBTENER LAS SERIES POPULARES
+      const requestOptions4 = {
+        method: "GET",
+        redirect: "follow"
+      };
+
+      fetch("https://api.themoviedb.org/3/trending/tv/week?language=es_MX&api_key=9cf1198f36410ea23852c01c0c427731", requestOptions4)
+        .then((response) => response.json())
+        .then((result) => {
+          this.series_Trending = result.results;
+        })
+        .catch((error) => console.error(error));
+
+    }
+  }).mount('#home')
+</script>
+
+</html>

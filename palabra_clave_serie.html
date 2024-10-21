@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles de la Serie</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="/Style/navbar.css">
+    <link rel="stylesheet" href="/Style/estilo.css">
+    <link rel="stylesheet" href="/Style/movie.css">
+    <link rel="stylesheet" href="/Style/palabra__clave.css">
+</head>
+
+<body>
+
+    <div class="menu-superior">
+        <div class="d-flex justify-content-between align-items-center flex-wrap flex-md-nowrap" style="height: 100%;">
+            <div class="opciones">
+                <a href="./home.html">
+                    <img src="/img/Logo.png" class="logo">
+                </a>
+                <div class="opciones-dropdown">
+                    <h4>Películas</h4>
+                    <div class="dropdown">
+                        <li><a href="./Listas/Lista_Peliculas/movies_popular.html">Populares</a></li>
+                        <li><a href="./Listas/Lista_Peliculas/movies_cartelera.html">En cartelera</a></li>
+                        <li><a href="./Listas/Lista_Peliculas/movies_rating.html">Mejor calificados</a></li>
+                    </div>
+                </div>
+                <div class="opciones-dropdown">
+                    <h4>Series de TV</h4>
+                    <div class="dropdown">
+                        <li><a href="./Listas/Lista_series/series_popular.html">Populares</a></li>
+                        <li><a href="./Listas/Lista_series/series_rating.html">Mejor calificados</a></li>
+                    </div>
+                </div>
+            </div>
+
+            <div class="opciones-perfil">
+                <div class="opciones-dropdown perfil-dropdown">
+                    <div class="button-perfil">
+                        <div class="icono-perfil">
+                            <img src="/img/perfil.png">
+                        </div>
+                    </div>
+                    <div class="dropdown-perfil">
+                        <li><a href="/Listas/Lista_Peliculas/movies_rated.html">Cerrar sesión</a></li>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="app" class="container mt-5">
+        <h1 class="text-center">Series relacionadas con: {{ nombrePalabraClave }}</h1>
+        <div class="row">
+            <div class="col-md-4" v-for="serie in seriesRelacionadas" :key="serie.id">
+                <div class="card mb-4 shadow-sm">
+                    <img :src="'https://image.tmdb.org/t/p/w500/' + serie.poster_path" class="card-img-top" alt="...">
+                    <h5 class="card-title">{{ serie.name }}</h5>
+                    <button class="btn btn-primary" @click="guardarDatos(serie)"> Detalles </button>
+                </div>
+            </div>
+        </div>
+        <div class="botonMasPeli">
+            <button @click="mostrar_mas()" type="button" class="btn btn-primary btn-lg btn-block">Mostrar más</button>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    seriesRelacionadas: [],
+                    palabraClave: JSON.parse(localStorage.getItem('palabraClaveSeleccionada')) || {},
+                    nombrePalabraClave: '',
+                    pagina: 1
+                };
+            },
+            methods: {
+                obtenerSeriesRelacionadas() {
+                    fetch(`https://api.themoviedb.org/3/discover/tv?api_key=9cf1198f36410ea23852c01c0c427731&with_keywords=${this.palabraClave}`)
+                        .then(response => response.json())
+                        .then(json => {
+                            if (json.results && json.results.length > 0) {
+                                this.seriesRelacionadas = json.results;  
+                            } else {
+                                alert('No se encontraron series relacionadas con esta palabra clave.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error al obtener las series relacionadas:', error);
+                        });
+                },
+                obtenerNombrePalabraClave() {
+                    fetch(`https://api.themoviedb.org/3/keyword/${this.palabraClave}?api_key=9cf1198f36410ea23852c01c0c427731`)
+                        .then(response => response.json())
+                        .then(json => {
+                            this.nombrePalabraClave = json.name;
+                            console.log(this.nombrePalabraClave);
+                        })
+                        .catch(error => {
+                            console.error('Error al obtener el nombre de la palabra clave:', error);
+                        });
+                },
+                mostrar_mas() {
+                    this.pagina++;
+                    this.obtenerSeriesRelacionadas();
+                    console.log(this.pagina);
+                },
+                guardarDatos(serie) {
+                    localStorage.setItem('serieSeleccionada', JSON.stringify(serie));
+                    window.location.href = 'serie.html';
+                },
+            },
+            async mounted() {
+                let logeado = localStorage.getItem("logeado");
+                let usuario = localStorage.getItem("usuario");
+                let request_token = localStorage.getItem("request_token");
+                let session_id = localStorage.getItem("session_id");
+
+                if (logeado == null && usuario == null) {
+                    window.location.href = "login.html";
+                }
+
+                this.obtenerNombrePalabraClave();
+                this.obtenerSeriesRelacionadas();
+                this.mostrar_mas();
+            }
+        }).mount('#app');
+    </script>
+
+</body>
+
+</html>

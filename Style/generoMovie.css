@@ -1,0 +1,61 @@
+body {
+    background-color: #f0f0f0;
+    color: #333;
+    font-family: 'Arial', sans-serif;
+}
+
+h1 {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 2.5rem;
+    color: #007BFF;
+}
+
+.peliculas-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 20px;
+}
+
+.pelicula {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 10px;
+    overflow: hidden;
+    width: 200px;
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.pelicula img {
+    width: 100%;
+    height: auto;
+    border-bottom: 4px solid #007BFF;
+}
+
+.pelicula h2 {
+    margin: 10px 0;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.pelicula:hover {
+    transform: scale(1.05);
+}
+
+.botonMasPeli{
+    margin-top: 50px;
+}
+
+button {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
